@@ -1,6 +1,7 @@
 package com.itgroup.bean;
 
 public class Book {
+    private int id ;
     private String title ;
     private String author ;
     private String publisher ;
@@ -10,10 +11,23 @@ public class Book {
     private int price ;
     private String ebook ;
 
+    public Book(int id, String title, String author, String publisher, String publication_date, int number_of_pages, String category, int price, String ebook) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.publisher = publisher;
+        this.publication_date = publication_date;
+        this.number_of_pages = number_of_pages;
+        this.category = category;
+        this.price = price;
+        this.ebook = ebook;
+    }
+
     @Override
     public String toString() {
         return "Book{" +
-                "title='" + title + '\'' +
+                "id=" + id +
+                ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
                 ", publisher='" + publisher + '\'' +
                 ", publication_date='" + publication_date + '\'' +
@@ -24,15 +38,12 @@ public class Book {
                 '}';
     }
 
-    public Book(String title, String author, String publisher, String publication_date, int number_of_pages, String category, int price, String ebook) {
-        this.title = title;
-        this.author = author;
-        this.publisher = publisher;
-        this.publication_date = publication_date;
-        this.number_of_pages = number_of_pages;
-        this.category = category;
-        this.price = price;
-        this.ebook = ebook;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -98,6 +109,4 @@ public class Book {
     public void setEbook(String ebook) {
         this.ebook = ebook;
     }
-
-
 }

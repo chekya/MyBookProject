@@ -1,4 +1,4 @@
 package com.itgroup.dao;
 
-public class BookDao {
+public class BookDao extends SuperDao {
 }
