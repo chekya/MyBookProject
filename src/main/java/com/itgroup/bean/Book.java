@@ -23,6 +23,10 @@ public class Book {
         this.ebook = ebook;
     }
 
+    public Book() {
+
+    }
+
     @Override
     public String toString() {
         return "Book{" +
@@ -108,5 +112,11 @@ public class Book {
 
     public void setEbook(String ebook) {
         this.ebook = ebook;
+    }
+
+    public String showBookInfo() {
+        return id + "\t" + title + "\t" + author + "\t" + publisher + "\t" +
+                publication_date + "\t" + number_of_pages + "\t" + category + "\t" +
+                price + "\t" + ebook;
     }
 }
