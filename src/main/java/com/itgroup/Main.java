@@ -28,6 +28,7 @@ public class Main {
                 case 4:
                     manager.deleteData();
                     break;
+
                 case 5:
                     manager.getSize();
                     break;

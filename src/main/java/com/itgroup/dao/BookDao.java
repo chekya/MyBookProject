@@ -124,18 +124,19 @@ public class BookDao extends SuperDao {
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                Book book = new Book(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        rs.getString("publisher"),
-                        rs.getDate("publication_date").toString(),
-                        rs.getInt("number_of_pages"),
-                        rs.getString("category"),
-                        rs.getInt("price"),
-                        rs.getString("ebook")
-                );
-                list.add(book);
+                Book book = new Book() ;
+                       book.setId(rs.getInt("id"));
+                        book.setTitle(rs.getString("title"));
+                        book.setAuthor(rs.getString("author"));
+                        book.setPublisher(rs.getString("publisher"));
+                        // null 체크 추가
+                Date pubDate = rs.getDate("publication_date");
+                        book.setPublication_date(pubDate != null ? pubDate.toString() : "");
+                        book.setNumber_of_pages(rs.getInt("number_of_pages"));
+                        book.setCategory(rs.getString("category"));
+                        book.setPrice(rs.getInt("price"));
+                        book.setEbook(rs.getString("ebook"));
+                        list.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -159,17 +160,18 @@ public class BookDao extends SuperDao {
             rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                book = new Book(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        rs.getString("publisher"),
-                        rs.getDate("publication_date").toString(),
-                        rs.getInt("number_of_pages"),
-                        rs.getString("category"),
-                        rs.getInt("price"),
-                        rs.getString("ebook")
-                );
+                book = new Book() ;
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+                book.setPublisher(rs.getString("publisher"));
+                // null 체크 추가
+                Date pubDate = rs.getDate("publication_date");
+                book.setPublication_date(pubDate != null ? pubDate.toString() : "");
+                book.setNumber_of_pages(rs.getInt("number_of_pages"));
+                book.setCategory(rs.getString("category"));
+                book.setPrice(rs.getInt("price"));
+                book.setEbook(rs.getString("ebook"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -191,8 +193,14 @@ public class BookDao extends SuperDao {
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             result = pstmt.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                if (conn != null) conn.rollback();
+            }catch (SQLException ex){
+                ex.printStackTrace();
+            }
         } finally {
             super.close(conn, pstmt);
         }
@@ -200,7 +208,6 @@ public class BookDao extends SuperDao {
     }
 
     public boolean existsById(int id) {
-
         String sql = "select count(*) from books where id=? and ebook = 'Y'";
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -213,7 +220,7 @@ public class BookDao extends SuperDao {
             pstmt.setInt(1, id);
             rs = pstmt.executeQuery();
 
-            if (rs.next()){
+            if (rs.next()) {
                 int count = rs.getInt(1);
                 result = (count > 0);
             }
@@ -226,10 +233,10 @@ public class BookDao extends SuperDao {
 
         return result;
     }
-
+// 카테고리별 조회 - 정확한 일치 검색
     public List<Book> selectByCategory(String category) {
         List<Book> list = new ArrayList<>();
-        String sql = "select * from books where category=? order by id";
+        String sql = "select * from books where trim(upper(category)) = trim(upper(?)) order by id";
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -237,21 +244,21 @@ public class BookDao extends SuperDao {
         try {
             conn = super.getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, category);
+            pstmt.setString(1, category.trim());
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                Book book = new Book(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        rs.getString("publisher"),
-                        rs.getDate("publication_date").toString(),
-                        rs.getInt("number_of_pages"),
-                        rs.getString("category"),
-                        rs.getInt("price"),
-                        rs.getString("ebook")
-                );
+                Book book = new Book() ;
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+                book.setPublisher(rs.getString("publisher"));
+                Date pubDate = rs.getDate("publication_date");
+                book.setPublication_date(pubDate != null ? pubDate.toString() : "");
+                book.setNumber_of_pages(rs.getInt("number_of_pages"));
+                book.setCategory(rs.getString("category"));
+                book.setPrice(rs.getInt("price"));
+                book.setEbook(rs.getString("ebook"));
                 list.add(book);
             }
         } catch (SQLException e) {
@@ -261,10 +268,10 @@ public class BookDao extends SuperDao {
         }
         return list;
     }
-
+    // 제목별 조회 - 부분 일치 검색
     public List<Book> selectByTitle(String title) {
         List<Book> list = new ArrayList<>();
-        String sql = "select * from books where title like ?";
+        String sql = "select * from books where trim(upper(title)) like trim(upper(?)) order by id";
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -272,23 +279,22 @@ public class BookDao extends SuperDao {
         try {
             conn = super.getConnection();
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, "%" + title + "%");
+            pstmt.setString(1, "%" + title.trim() + "%");
             rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                Book book = new Book(
-
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        rs.getString("publisher"),
-                        rs.getDate("publication_date").toString(),
-                        rs.getInt("number_of_pages"),
-                        rs.getString("category"),
-                        rs.getInt("price"),
-                        rs.getString("ebook")
-                );
-                list.add(book);
+            Book book = new Book() ;
+            book.setId(rs.getInt("id"));
+            book.setTitle(rs.getString("title"));
+            book.setAuthor(rs.getString("author"));
+            book.setPublisher(rs.getString("publisher"));
+            Date pubDate = rs.getDate("publication_date");
+            book.setPublication_date(pubDate != null ? pubDate.toString() : "");
+            book.setNumber_of_pages(rs.getInt("number_of_pages"));
+            book.setCategory(rs.getString("category"));
+            book.setPrice(rs.getInt("price"));
+            book.setEbook(rs.getString("ebook"));
+            list.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -298,30 +304,30 @@ public class BookDao extends SuperDao {
 
         return list;
     }
+    // 제목으로 전자책 여부 확인
+    public boolean existsEbookByTitle(String title) {
+        String sql = "select count(*) from books where trim (upper(title)) like trim(upper(?)) and ebook = 'Y'";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        boolean result = false;
 
- public boolean existsEbookByTitle(String title){
-        String sql = "select count(*) from books where title like ? and ebook = 'Y'";
-     Connection conn = null;
-     PreparedStatement pstmt = null;
-     ResultSet rs = null;
-     boolean result = false;
+        try {
+            conn = super.getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + title.trim() + "%");
+            rs = pstmt.executeQuery();
 
-     try {
-         conn = super.getConnection();
-         pstmt = conn.prepareStatement(sql);
-         pstmt.setString(1, "%" + title + "%");
-         rs = pstmt.executeQuery();
+            if (rs.next()) {
+                result = rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            super.close(conn, pstmt, rs);
+        }
 
-         if (rs.next()) {
-             result = rs.getInt(1) > 0;
-         }
-     }catch (SQLException e) {
-         e.printStackTrace();
-     }finally {
-         super.close(conn, pstmt, rs);
-     }
-
-     return  result ;
- }
+        return result;
+    }
 }
 
